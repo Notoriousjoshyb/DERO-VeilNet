@@ -1,0 +1,36 @@
+# VeilNet build outputs
+dist/
+*.exe
+*.test
+*.out
+
+# SQLite state
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Secrets / keys / tokens (NEVER commit)
+*.key
+*.pem
+service.token
+config.toml
+*-config.toml
+
+# Wails build artifacts
+build/
+frontend/dist/
+
+# Go
+vendor/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*~
+
+# Release packages
+release/
+.veilnet-dev/

@@ -1,0 +1,7 @@
+# Devnet dero-mock: worthless DEV-token fake chain. Never mainnet.
+FROM python:3.12-slim
+ENV VEILNET_NETWORK=devnet
+WORKDIR /srv
+COPY dero-mock.py /srv/dero-mock.py
+EXPOSE 18091
+CMD ["python", "/srv/dero-mock.py"]

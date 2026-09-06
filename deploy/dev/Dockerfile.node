@@ -1,0 +1,16 @@
+# Devnet veilnet-node image. Built from the repo root (build context: ..).
+# Runs `veilnet-node` in devnet mode only: the entrypoint refuses mainnet.
+FROM golang:1.22-bookworm AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /out/veilnet-node ./cmd/veilnet-node
+
+FROM debian:bookworm-slim
+ENV VEILNET_NETWORK=devnet
+COPY --from=build /out/veilnet-node /usr/local/bin/veilnet-node
+COPY deploy/dev/node-entrypoint.sh /usr/local/bin/node-entrypoint.sh
+RUN chmod +x /usr/local/bin/node-entrypoint.sh
+EXPOSE 51820/udp 18101
+ENTRYPOINT ["/usr/local/bin/node-entrypoint.sh"]

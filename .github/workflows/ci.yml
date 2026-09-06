@@ -1,0 +1,50 @@
+name: veilnet-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    name: unit + security tests (no fixtures)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Unit + security suites
+        run: go test ./tests/ ./tests/security/ -count=1 -v
+      - name: Integration suite without fixtures (must SKIP, never fail/claim)
+        run: go test ./tests/integration/ -count=1 -v
+
+  devnet:
+    name: devnet integration (linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Validate compose
+        run: docker compose -f deploy/docker-compose.yml config --quiet
+      - name: Start observation fixtures only
+        run: |
+          export VEILNET_NETWORK=devnet
+          docker compose -f deploy/docker-compose.yml up -d --build test-server dero-mock
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:18080/health && curl -fsS http://127.0.0.1:18091/health && break
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:18080/health
+          curl -fsS http://127.0.0.1:18091/health
+      - name: Fixture honesty check (unconfigured tunnel fixtures SKIP)
+        run: |
+          export VEILNET_DEVNET_SERVER=http://127.0.0.1:18080
+          go test ./tests/integration/ -count=1 -v
+      - name: Teardown
+        if: always()
+        run: docker compose -f deploy/docker-compose.yml down

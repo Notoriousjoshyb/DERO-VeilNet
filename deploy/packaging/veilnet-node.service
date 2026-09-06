@@ -1,0 +1,20 @@
+[Unit]
+Description=VeilNet exit/relay node daemon
+Documentation=https://github.com/dero-veilnet/veilnet
+After=network-online.target veilnet.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/veilnet-node run
+Restart=on-failure
+RestartSec=10
+# Node operators: run behind your own hardening. Options once reviewed:
+#   User=veilnet  (create the user first: useradd -r -s /usr/sbin/nologin veilnet)
+#   NoNewPrivileges=true
+#   ProtectSystem=strict
+#   PrivateTmp=true
+# Enable only on node machines: systemctl enable --now veilnet-node.service
+
+[Install]
+WantedBy=multi-user.target

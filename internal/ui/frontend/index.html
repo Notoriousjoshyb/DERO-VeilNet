@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>VeilNet</title>
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<!-- Shared inline icon sprite: defined once, referenced by <use>. -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M5 15l-2 6 6-2M14.5 4.5a7 7 0 0 1 5 5L11 18l-5-5 8.5-8.5Z"/><circle cx="15" cy="9" r="1.6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6l7-3Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18Z"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6H14a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h.5"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 0 1 0 3.6h-3a1.8 1.8 0 0 0 0 3.6h4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-chain" viewBox="0 0 24 24"><path d="M10 13a4 4 0 0 0 6 .5l2-2a4 4 0 0 0-5.6-5.7L11 7"/><path d="M14 11a4 4 0 0 0-6-.5l-2 2A4 4 0 0 0 11.6 18L13 17"/></symbol>
+    <symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.01"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M16.5 14.5h.01"/><path d="M17 6V5a2 2 0 0 0-2.5-1.9L5 5"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v6M15 3v6M6 9h12v3a6 6 0 0 1-12 0V9ZM12 18v3"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img class="brand-mark" src="/logo.png" alt="VeilNet logo">
+      <span class="brand-name">VEILNET</span>
+    </div>
+
+    <nav id="nav" aria-label="Main">
+      <p class="nav-group">Connection</p>
+      <button data-screen="home" class="active"><svg><use href="#i-shield"/></svg><span>Home</span></button>
+      <button data-screen="locations"><svg><use href="#i-globe"/></svg><span>Locations</span></button>
+      <button data-screen="nodes"><svg><use href="#i-server"/></svg><span>Nodes</span></button>
+      <button data-screen="circuit"><svg><use href="#i-route"/></svg><span>Circuit</span></button>
+      <p class="nav-group">Trust</p>
+      <button data-screen="wallet"><svg><use href="#i-wallet"/></svg><span>Wallet</span><i id="wallet-dot" class="nav-dot ok hidden"></i></button>
+      <button data-screen="payment"><svg><use href="#i-coin"/></svg><span>Payment</span><i id="pay-dot" class="nav-dot hidden"></i></button>
+      <button data-screen="privacy"><svg><use href="#i-lock"/></svg><span>Privacy</span></button>
+      <button data-screen="dero"><svg><use href="#i-chain"/></svg><span>DERO</span></button>
+      <p class="nav-group">System</p>
+      <button data-screen="settings"><svg><use href="#i-cog"/></svg><span>Settings</span></button>
+      <button data-screen="diagnostics"><svg><use href="#i-pulse"/></svg><span>Diagnostics</span></button>
+      <button data-screen="onboard"><svg><use href="#i-rocket"/></svg><span>Get started</span></button>
+      <button data-screen="about"><svg><use href="#i-info"/></svg><span>About</span></button>
+    </nav>
+
+    <div class="side-foot">
+      <div id="conn-pill" class="pill down"><i class="dot"></i><span>DISCONNECTED</span></div>
+      <p class="side-note">Control plane: DERO<br>Data plane: WireGuard</p>
+    </div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <button id="nav-toggle" class="icon-btn" aria-label="Toggle menu"><svg><use href="#i-menu"/></svg></button>
+      <h1 id="page-title">Home</h1>
+      <span id="demo-badge" class="demo-badge hidden" title="Seeded fake nodes. Isolated from production state.">DEMO</span>
+      <div class="spacer"></div>
+      <div class="quickstats">
+        <div><label>Down</label><span id="q-rx">&mdash;</span></div>
+        <div><label>Up</label><span id="q-tx">&mdash;</span></div>
+        <div><label>Time</label><span id="q-elapsed">&mdash;</span></div>
+      </div>
+    </header>
+
+    <main>
+      <div id="err-banner" class="err-banner hidden" role="alert"></div>
+
+      <!-- ===================== ONBOARD ===================== -->
+      <section id="screen-onboard" class="screen">
+        <div class="wiz-rail">
+          <ol id="wiz-rail" class="steps">
+            <li data-step="1" class="on">Welcome</li>
+            <li data-step="2">How it works</li>
+            <li data-step="3">Speed &amp; region</li>
+            <li data-step="4">Connect</li>
+            <li data-step="5">Done</li>
+          </ol>
+          <button id="wiz-skip" class="linklike">Skip tour</button>
+        </div>
+
+        <div id="wst-1" class="wiz-step active">
+          <img class="wiz-logo" src="/logo-full.png" alt="VeilNet">
+          <h3>Welcome to VeilNet</h3>
+          <p>A decentralized privacy VPN. This tour connects you in under a minute. There are no config files to edit.</p>
+          <div class="tiles">
+            <div class="tile"><b>Zero setup</b><span>Safe defaults are already on.</span></div>
+            <div class="tile"><b>No telemetry</b><span>No analytics, no traffic logging.</span></div>
+            <div class="tile"><b>You approve spend</b><span>Nothing is ever paid silently.</span></div>
+          </div>
+          <div class="row"><button id="wiz-next-1" class="primary">How it works &rarr;</button></div>
+        </div>
+
+        <div id="wst-2" class="wiz-step">
+          <h3>How it works</h3>
+          <div class="planes">
+            <div class="plane">
+              <span class="plane-tag ctl">Control plane</span>
+              <b>DERO</b>
+              <p>Node discovery, session authorization and payments only. Your traffic never travels here.</p>
+            </div>
+            <div class="plane-link" aria-hidden="true"></div>
+            <div class="plane">
+              <span class="plane-tag data">Data plane</span>
+              <b>WireGuard</b>
+              <p>An encrypted tunnel from your device straight to the exit node.</p>
+            </div>
+          </div>
+          <div class="row">
+            <button id="wiz-back-2">&larr; Back</button>
+            <button id="wiz-next-2" class="primary">Pick speed &rarr;</button>
+          </div>
+        </div>
+
+        <div id="wst-3" class="wiz-step">
+          <h3>Speed &amp; region</h3>
+          <p class="muted">Pick how VeilNet chooses an exit node. You can change this any time in Settings.</p>
+          <div class="field-grid">
+            <label class="field">
+              <span>Selection policy</span>
+              <select id="wiz-policy">
+                <option value="FASTEST">Fastest</option>
+                <option value="LOWEST_LOAD">Lowest load</option>
+                <option value="LOWEST_PRICE">Lowest price</option>
+                <option value="PRIVACY">Privacy</option>
+                <option value="SPECIFIC_REGION">Specific region</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Region <em class="muted">(optional)</em></span>
+              <input id="wiz-region" type="text" placeholder="eu-west">
+            </label>
+          </div>
+          <div class="row">
+            <button id="wiz-back-3">&larr; Back</button>
+            <button id="wiz-next-3" class="primary">Save &amp; continue &rarr;</button>
+          </div>
+        </div>
+
+        <div id="wst-4" class="wiz-step">
+          <h3>Connect</h3>
+          <p class="muted">VeilNet auto-picks the fastest node. Paid nodes ask for your explicit approval first.</p>
+          <p id="wiz-msg" class="wiz-msg"></p>
+          <div class="row">
+            <button id="wiz-back-4">&larr; Back</button>
+            <button id="wiz-connect" class="primary">Connect now</button>
+          </div>
+        </div>
+
+        <div id="wst-5" class="wiz-step">
+          <h3>You are set up</h3>
+          <p>Connected via <span id="wiz-done-node" class="ok mono">&mdash;</span>. You are protected while the status reads <b class="ok">PROTECTED</b>.</p>
+          <div class="row"><button id="wiz-done" class="primary">Open dashboard</button></div>
+        </div>
+      </section>
+
+      <!-- ===================== HOME ===================== -->
+      <section id="screen-home" class="screen active">
+        <div class="hero">
+          <button id="shield-btn" class="dial down" aria-label="Toggle connection">
+            <svg class="dial-ring" viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="ring-track" cx="100" cy="100" r="88"/>
+              <circle id="ring-arc" class="ring-arc" cx="100" cy="100" r="88"/>
+            </svg>
+            <span class="dial-core">
+              <svg id="shield" class="dial-icon" aria-hidden="true"><use href="#i-shield"/></svg>
+              <span id="dial-label" class="dial-label">OFF</span>
+            </span>
+          </button>
+
+          <h2 id="status-line">Disconnected</h2>
+          <p id="status-sub" class="muted">Select a node to establish a private tunnel.</p>
+
+          <div class="row center">
+            <button id="btn-connect" class="primary lg">Connect</button>
+            <button id="btn-disconnect" class="danger lg">Disconnect</button>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><label>Elapsed</label><span id="stat-elapsed">&mdash;</span></div>
+          <div class="stat"><label>Downloaded</label><span id="stat-rx">&mdash;</span></div>
+          <div class="stat"><label>Uploaded</label><span id="stat-tx">&mdash;</span></div>
+          <div class="stat"><label>Exit node</label><span id="stat-node" class="mono">&mdash;</span></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Live throughput</h3>
+            <div class="legend">
+              <i class="sw rx"></i>down <span id="spark-rx" class="mono">0 B/s</span>
+              <i class="sw tx"></i>up <span id="spark-tx" class="mono">0 B/s</span>
+            </div>
+          </div>
+          <svg id="spark" class="spark" viewBox="0 0 600 120" preserveAspectRatio="none" aria-label="Throughput graph">
+            <polyline id="spark-line-rx" class="sl rx" points=""/>
+            <polyline id="spark-line-tx" class="sl tx" points=""/>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ===================== LOCATIONS ===================== -->
+      <section id="screen-locations" class="screen">
+        <div class="toolbar">
+          <label class="search"><svg><use href="#i-search"/></svg><input id="loc-search" type="text" placeholder="Filter by country, city or region"></label>
+        </div>
+        <div id="locations" class="cards"></div>
+        <p id="loc-empty" class="empty hidden">No locations match that filter.</p>
+      </section>
+
+      <!-- ===================== NODES ===================== -->
+      <section id="screen-nodes" class="screen">
+        <div class="toolbar">
+          <label class="search"><svg><use href="#i-search"/></svg><input id="node-search" type="text" placeholder="Filter nodes"></label>
+          <select id="policy" aria-label="Selection policy">
+            <option value="FASTEST">Fastest</option>
+            <option value="LOWEST_LOAD">Lowest load</option>
+            <option value="LOWEST_PRICE">Lowest price</option>
+            <option value="PRIVACY">Privacy</option>
+            <option value="SPECIFIC_REGION">Specific region</option>
+          </select>
+          <button id="btn-autoselect" class="primary">Auto-select &amp; connect</button>
+        </div>
+        <div class="table-wrap">
+          <table id="nodes-table">
+            <thead><tr>
+              <th data-sort="NodeID">Node</th>
+              <th data-sort="City">Location</th>
+              <th data-sort="Endpoint">Endpoint</th>
+              <th data-sort="PricePerHourDero" class="num">Price/h</th>
+              <th data-sort="LatencyMs" class="num">Latency</th>
+              <th data-sort="Load">Load</th>
+              <th data-sort="Trust">Trust</th>
+              <th data-sort="Status">Status</th>
+              <th aria-label="Action"></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="node-empty" class="empty hidden">No nodes match that filter.</p>
+      </section>
+
+      <!-- ===================== CIRCUIT ===================== -->
+      <section id="screen-circuit" class="screen">
+        <div class="panel">
+          <div class="panel-head"><h3 id="circuit-state">Direct connection (single hop).</h3></div>
+          <div id="circuit-chain" class="hops"></div>
+          <p id="circuit-guard" class="muted">Guard: none (build a circuit to pin an entry).</p>
+        </div>
+        <div class="row">
+          <button id="btn-autocircuit">Build 2-hop circuit</button>
+          <button id="btn-autocircuit3">Build 3-hop circuit</button>
+          <button id="btn-rotate">Rotate exit</button>
+          <button id="btn-guard-reset" class="danger">Reset guard</button>
+        </div>
+        <div class="note">
+          <svg><use href="#i-route"/></svg>
+          <span>The entry guard stays pinned, so rotating the exit never exposes you to a fresh first hop.</span>
+        </div>
+      </section>
+
+      <!-- ===================== WALLET ===================== -->
+      <section id="screen-wallet" class="screen">
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Connection</h3>
+            <span id="wallet-pill" class="badge">not connected</span>
+          </div>
+
+          <div class="seg" role="tablist" aria-label="Wallet mode">
+            <button type="button" class="seg-btn active" data-wmode="XSWD" role="tab">XSWD bridge</button>
+            <button type="button" class="seg-btn" data-wmode="RPC" role="tab">Wallet RPC</button>
+            <button type="button" class="seg-btn" data-wmode="NONE" role="tab">No wallet</button>
+          </div>
+
+          <div id="wmode-XSWD" class="wmode">
+            <p class="muted">Your wallet asks you to approve VeilNet, and asks again for every payment. VeilNet never sees your seed or your keys. This is the safer choice.</p>
+            <div class="field-grid">
+              <label class="field">
+                <span>XSWD socket</span>
+                <input id="w-xswd-endpoint" type="text" placeholder="ws://127.0.0.1:44326/xswd">
+              </label>
+              <label class="field">
+                <span>App name shown in the wallet</span>
+                <input id="w-appname" type="text" placeholder="VeilNet">
+              </label>
+            </div>
+            <p class="muted small">Open your DERO wallet, turn on XSWD, then press Connect. A prompt appears in the wallet.</p>
+          </div>
+
+          <div id="wmode-RPC" class="wmode hidden">
+            <p class="muted">VeilNet talks to a local wallet JSON-RPC server. Fill in the user and password only if you started the wallet with <span class="mono">--rpc-login</span>.</p>
+            <div class="field-grid">
+              <label class="field">
+                <span>Wallet RPC endpoint</span>
+                <input id="w-rpc-endpoint" type="text" placeholder="http://127.0.0.1:10103">
+              </label>
+              <label class="field">
+                <span>RPC user <em class="muted">(optional)</em></span>
+                <input id="w-rpc-user" type="text" autocomplete="off">
+              </label>
+              <label class="field">
+                <span>RPC password <em class="muted">(optional)</em></span>
+                <input id="w-rpc-pass" type="password" autocomplete="off" placeholder="leave blank to keep the saved one">
+              </label>
+            </div>
+            <p class="muted small">Keep the endpoint on 127.0.0.1. VeilNet never sends these credentials anywhere else.</p>
+          </div>
+
+          <div id="wmode-NONE" class="wmode hidden">
+            <p class="muted">Run without a wallet. Demo nodes and free nodes still work; paid nodes will not connect.</p>
+          </div>
+
+          <label class="switch">
+            <input id="w-persist" type="checkbox" checked><i></i>
+            <span>Remember these settings<em>Saved to your config file. The password is stored there too.</em></span>
+          </label>
+
+          <div class="row">
+            <button id="btn-wallet-connect" class="primary"><svg><use href="#i-plug"/></svg><span>Connect wallet</span></button>
+            <button id="btn-wallet-refresh"><svg><use href="#i-refresh"/></svg><span>Refresh</span></button>
+            <button id="btn-wallet-disconnect" class="danger">Disconnect</button>
+          </div>
+          <p id="wallet-msg" class="muted small"></p>
+        </div>
+
+        <div id="wallet-info" class="cards"></div>
+
+        <div class="note ok-note">
+          <svg><use href="#i-lock"/></svg>
+          <span>Connecting only reads your address and balance. No transfer happens until you approve one.</span>
+        </div>
+      </section>
+
+      <!-- ===================== PAYMENT ===================== -->
+      <section id="screen-payment" class="screen">
+        <div id="payment-info" class="cards"></div>
+        <div class="row"><button id="btn-approve" class="primary">Request approval</button></div>
+
+        <div id="pay-panel" class="panel">
+          <div class="panel-head">
+            <h3>Send an approved payment</h3>
+            <span id="pay-wallet-pill" class="badge">no wallet</span>
+          </div>
+          <p class="muted">This is the only place VeilNet moves DERO, and only after you request approval above. In XSWD mode your wallet asks a second time.</p>
+          <div class="field-grid">
+            <label class="field">
+              <span>Destination address</span>
+              <input id="pay-dest" type="text" placeholder="dero1q...">
+            </label>
+            <label class="field">
+              <span>Amount (DERO)</span>
+              <input id="pay-amount" type="text" inputmode="decimal" placeholder="0.05">
+            </label>
+          </div>
+          <div class="row">
+            <button id="btn-pay" class="primary">Review and send</button>
+            <span id="pay-msg" class="muted small"></span>
+          </div>
+        </div>
+
+        <div class="note ok-note">
+          <svg><use href="#i-lock"/></svg>
+          <span>VeilNet never spends without your explicit approval. No custodial wallet, no auto-spend.</span>
+        </div>
+      </section>
+
+      <!-- ===================== PRIVACY ===================== -->
+      <section id="screen-privacy" class="screen">
+        <div id="privacy-checks" class="cards"></div>
+        <div class="note">
+          <svg><use href="#i-info"/></svg>
+          <span>Checks run against the live engine. A failing check means traffic may not be protected.</span>
+        </div>
+      </section>
+
+      <!-- ===================== DERO ===================== -->
+      <section id="screen-dero" class="screen">
+        <div id="dero-info" class="cards"></div>
+        <div class="note">
+          <svg><use href="#i-chain"/></svg>
+          <span>DERO carries control messages and payments only &mdash; never user traffic.</span>
+        </div>
+      </section>
+
+      <!-- ===================== SETTINGS ===================== -->
+      <section id="screen-settings" class="screen">
+        <form id="settings-form">
+          <div class="panel">
+            <div class="panel-head"><h3>Protection</h3></div>
+            <label class="field">
+              <span>Kill switch</span>
+              <select name="killswitch">
+                <option value="OFF">Off</option>
+                <option value="ON_WHILE_CONNECTED">On while connected</option>
+                <option value="ALWAYS_ON">Always on</option>
+              </select>
+            </label>
+            <label class="switch">
+              <input name="ipv6" type="checkbox"><i></i>
+              <span>Route IPv6<em>Leave off to block IPv6 and stop leaks.</em></span>
+            </label>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>DNS</h3></div>
+            <label class="field">
+              <span>DNS mode</span>
+              <select name="dns_mode">
+                <option value="VEILNET">VeilNet resolver</option>
+                <option value="CUSTOM">Custom servers</option>
+                <option value="DOH">DNS over HTTPS</option>
+                <option value="SYSTEM">System (explicit only)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>DNS servers <em class="muted">(comma separated)</em></span>
+              <input name="dns_servers" type="text" placeholder="10.0.0.53, 10.0.0.54">
+            </label>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Routing</h3></div>
+            <label class="field">
+              <span>Preferred region</span>
+              <input name="region" type="text" placeholder="eu-west">
+            </label>
+            <label class="switch">
+              <input name="auto_connect" type="checkbox"><i></i>
+              <span>Auto-connect<em>Connect as soon as VeilNet starts.</em></span>
+            </label>
+            <label class="switch">
+              <input name="multihop" type="checkbox"><i></i>
+              <span>Multihop<em>Route through 2 or 3 nodes instead of one.</em></span>
+            </label>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Traffic shaping</h3></div>
+            <label class="field">
+              <span>Cover traffic</span>
+              <select name="cover_mode">
+                <option value="OFF">Off (default)</option>
+                <option value="PAD">Pad packet sizes</option>
+                <option value="CONSTANT">Constant rate</option>
+              </select>
+            </label>
+            <p class="muted small">
+              <b>Pad</b> hides how big your packets are. <b>Constant rate</b> also hides
+              when you send them, as long as your link keeps up — it costs real bandwidth.
+              Neither hides you from someone who can watch both ends of the internet.
+            </p>
+            <p class="muted small">
+              Entry transport: <span class="mono">direct</span> (plain UDP). No
+              censorship-resistant transport ships in this build.
+            </p>
+          </div>
+
+          <div class="row">
+            <button type="submit" class="primary">Save settings</button>
+            <span id="settings-msg" class="muted"></span>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===================== DIAGNOSTICS ===================== -->
+      <section id="screen-diagnostics" class="screen">
+        <div class="toolbar">
+          <button id="btn-diag" class="primary"><svg><use href="#i-refresh"/></svg><span>Refresh</span></button>
+          <button id="btn-diag-copy"><svg><use href="#i-copy"/></svg><span>Copy JSON</span></button>
+        </div>
+        <pre id="diag-out" class="diag">Press Refresh to run the checks.</pre>
+      </section>
+
+      <!-- ===================== ABOUT ===================== -->
+      <section id="screen-about" class="screen">
+        <div class="panel about">
+          <img class="about-logo" src="/logo-full.png" alt="VeilNet">
+          <p>A decentralized privacy VPN. WireGuard data plane, DERO control plane.</p>
+          <ul class="ticks">
+            <li>No analytics. No telemetry. No traffic-content logging.</li>
+            <li>No custodial or auto-spending wallets.</li>
+            <li>User traffic never crosses DERO &mdash; control plane only, forever.</li>
+          </ul>
+        </div>
+        <div class="cards">
+          <div class="card"><h3>v1</h3><div class="k">this milestone</div><div class="v">Single-hop VPN</div></div>
+          <div class="card"><h3>v1.1</h3><div class="k">next</div><div class="v">Kernel paths, audit, installers</div></div>
+          <div class="card"><h3>v2</h3><div class="k">planned</div><div class="v">Multi-hop &le;3, per-hop billing</div></div>
+          <div class="card"><h3>v3</h3><div class="k">planned</div><div class="v">Reputation, mobile, SDK</div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-card">
+    <h3 id="modal-title">Approve payment</h3>
+    <p id="modal-body" class="muted"></p>
+    <div class="row end">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-ok" class="primary">Approve</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+<script src="/circuit.js"></script>
+<script src="/wizard.js"></script>
+<script src="/wallet.js"></script>
+</body>
+</html>

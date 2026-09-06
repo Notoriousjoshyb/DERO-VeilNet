@@ -1,0 +1,4 @@
+ID=ubuntu
+VERSION_ID="22.04"
+NAME="Ubuntu"
+ID_LIKE=debian

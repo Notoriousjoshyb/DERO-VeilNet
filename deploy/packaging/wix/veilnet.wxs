@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VeilNet Windows installer (WiX v3).
+  Build (on Windows, after .\scripts\build.ps1):
+    candle.exe -dProductVersion=1.0.0 -dDistDir=dist -out obj\ wix\veilnet.wxs
+    light.exe -ext WixUtilExtension -out veilnet-1.0.0.msi obj\veilnet.wixobj
+  ProductVersion must be numeric MAJOR.MINOR.PATCH: stamp it from
+  dist\VERSION (e.g. git tag 1.2.3) via -dProductVersion, or from
+  $env:VERSION in CI. Without WiX, ship dist\*.exe as a .zip instead
+  (see docs/PACKAGING.md fallback).
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="VeilNet" Language="1033"
+           Version="$(var.ProductVersion)" Manufacturer="VeilNet"
+           UpgradeCode="7A3B9E01-4C2D-4F6A-9E8B-1A2B3C4D5E6F">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of VeilNet is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="VeilNet" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="VeilNet">
+          <Component Id="ClientExe" Guid="11111111-2222-4333-8444-555555555555">
+            <File Id="VeilNetExe" Source="$(var.DistDir)\veilnet.exe" KeyPath="yes" />
+          </Component>
+          <Component Id="NodeExe" Guid="22222222-3333-4444-8555-666666666666">
+            <File Id="VeilNetNodeExe" Source="$(var.DistDir)\veilnet-node.exe" KeyPath="no" />
+          </Component>
+          <Component Id="ServiceExe" Guid="33333333-4444-4555-8666-777777777777">
+            <File Id="VeilNetServiceExe" Source="$(var.DistDir)\veilnet-service.exe" KeyPath="no" />
+            <ServiceInstall Id="VeilNetServiceInstall" Name="VeilNetService"
+                            DisplayName="VeilNet Service"
+                            Description="VeilNet privileged service (WireGuard data plane host, IPC endpoint)."
+                            Type="ownProcess" Start="demand" ErrorControl="normal" />
+            <ServiceControl Id="VeilNetServiceControl" Name="VeilNetService"
+                            Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="ProductComponents">
+      <ComponentRef Id="ClientExe" />
+      <ComponentRef Id="NodeExe" />
+      <ComponentRef Id="ServiceExe" />
+    </ComponentGroup>
+  </Product>
+</Wix>

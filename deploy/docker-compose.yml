@@ -1,0 +1,151 @@
+# DERO // VEILNET devnet — LOCAL TESTING ONLY. Never mainnet.
+#
+# Topology (all on an isolated bridge, no host networking):
+#   nodeA / nodeB / nodeC  veilnet-node dev builds (distinct regions/prices)
+#   test-server            observation point: /whoami, /dns, /bounce-target
+#   dero-mock              fake chain/wallet: balances, approvals, receipts
+#
+# Separation guarantees:
+#   - VEILNET_NETWORK=devnet is injected into every container; node binaries
+#     MUST refuse to start with --mainnet or MAINNET=1 (see scripts/devnet-up).
+#   - dero-mock binds devnet only and mints worthless DEV tokens (prefix "DEV-").
+#   - No mainnet seed, address, or key material is ever mounted here; the
+#     compose file mounts ../.veilnet-dev (created by devnet-up) instead of
+#     ~/.veilnet so prod state can never mix with dev state.
+#
+# Usage:
+#   pwsh scripts/devnet-up.ps1      # Windows 11
+#   bash scripts/devnet-up.sh       # Linux / macOS
+#   go test ./tests/integration/... # with fixture env printed by up script
+
+name: veilnet-devnet
+
+networks:
+  devnet:
+    name: veilnet-devnet
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+services:
+  nodeA:
+    build:
+      context: ..
+      dockerfile: deploy/dev/Dockerfile.node
+    container_name: veilnet-nodeA
+    hostname: nodeA
+    networks:
+      devnet:
+        ipv4_address: 172.28.1.11
+    environment:
+      VEILNET_NETWORK: devnet
+      VEILNET_NODE_ID: nodeA
+      VEILNET_REGION: eu-central
+      VEILNET_COUNTRY: DE
+      VEILNET_CITY: Nuremberg
+      VEILNET_WG_PORT: "51820"
+      VEILNET_PRICE_PER_HOUR: "0.01"
+      VEILNET_DERO_MOCK: http://dero-mock:18091
+      VEILNET_TEST_SERVER: http://test-server:18080
+    ports:
+      - "127.0.0.1:51820:51820/udp"   # WireGuard dev listener (host-local only)
+      - "127.0.0.1:18101:18101"       # node control API inc. POST /bounce
+    volumes:
+      - ../.veilnet-dev/nodeA:/data
+    depends_on:
+      - dero-mock
+      - test-server
+    restart: "no"
+
+  nodeB:
+    build:
+      context: ..
+      dockerfile: deploy/dev/Dockerfile.node
+    container_name: veilnet-nodeB
+    hostname: nodeB
+    networks:
+      devnet:
+        ipv4_address: 172.28.1.12
+    environment:
+      VEILNET_NETWORK: devnet
+      VEILNET_NODE_ID: nodeB
+      VEILNET_REGION: us-east
+      VEILNET_COUNTRY: US
+      VEILNET_CITY: Ashburn
+      VEILNET_WG_PORT: "51820"
+      VEILNET_PRICE_PER_HOUR: "0.05"
+      VEILNET_DERO_MOCK: http://dero-mock:18091
+      VEILNET_TEST_SERVER: http://test-server:18080
+    ports:
+      - "127.0.0.1:51821:51820/udp"
+      - "127.0.0.1:18102:18101"
+    volumes:
+      - ../.veilnet-dev/nodeB:/data
+    depends_on:
+      - dero-mock
+      - test-server
+    restart: "no"
+
+  nodeC:
+    build:
+      context: ..
+      dockerfile: deploy/dev/Dockerfile.node
+    container_name: veilnet-nodeC
+    hostname: nodeC
+    networks:
+      devnet:
+        ipv4_address: 172.28.1.13
+    environment:
+      VEILNET_NETWORK: devnet
+      VEILNET_NODE_ID: nodeC
+      VEILNET_REGION: ap-southeast
+      VEILNET_COUNTRY: SG
+      VEILNET_CITY: Singapore
+      VEILNET_WG_PORT: "51820"
+      VEILNET_PRICE_PER_HOUR: "0.02"
+      VEILNET_DERO_MOCK: http://dero-mock:18091
+      VEILNET_TEST_SERVER: http://test-server:18080
+    ports:
+      - "127.0.0.1:51822:51820/udp"
+      - "127.0.0.1:18103:18101"
+    volumes:
+      - ../.veilnet-dev/nodeC:/data
+    depends_on:
+      - dero-mock
+      - test-server
+    restart: "no"
+
+  test-server:
+    build:
+      context: .
+      dockerfile: dev/Dockerfile.testserver
+    container_name: veilnet-test-server
+    hostname: test-server
+    networks:
+      devnet:
+        ipv4_address: 172.28.1.20
+    environment:
+      VEILNET_NETWORK: devnet
+      TEST_SERVER_PORT: "18080"
+    ports:
+      - "127.0.0.1:18080:18080" # observation API for integration tests
+    restart: "no"
+
+  dero-mock:
+    build:
+      context: .
+      dockerfile: dev/Dockerfile.deromock
+    container_name: veilnet-dero-mock
+    hostname: dero-mock
+    networks:
+      devnet:
+        ipv4_address: 172.28.1.30
+    environment:
+      VEILNET_NETWORK: devnet
+      DERO_MOCK_PORT: "18091"
+    ports:
+      - "127.0.0.1:18091:18091" # mock chain/wallet API (DEV tokens only)
+    volumes:
+      - ../.veilnet-dev/dero-mock:/data
+    restart: "no"

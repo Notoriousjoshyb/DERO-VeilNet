@@ -1,0 +1,20 @@
+[Unit]
+Description=VeilNet privileged service (WireGuard data plane host, IPC endpoint)
+Documentation=https://github.com/dero-veilnet/veilnet
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/veilnet-service
+Restart=on-failure
+RestartSec=5
+# Hardening: the service needs NET_ADMIN for WireGuard/routes/firewall, so it
+# stays root. Tighten further once your threat review allows, e.g.:
+#   NoNewPrivileges=true
+#   ProtectSystem=strict
+#   ProtectHome=true
+#   PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
